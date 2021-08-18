@@ -1,0 +1,26 @@
+version: "3.9"
+
+services: 
+  
+  server:
+    image: spikecodes/libreddit:arm
+    hostname: libreddit
+    container_name: libreddit-server
+    networks: 
+      - traefik-public
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+
+      # Access Router
+      - "traefik.http.routers.libreddit.rule=Host(`${LIBREDDIT_HOSTNAME}`)"
+      - "traefik.http.routers.libreddit.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.libreddit.entrypoints=websecure"
+      - "traefik.http.routers.libreddit.service=libreddit-service"
+
+      # Service
+      - "traefik.http.services.libreddit-service.loadbalancer.server.port=8080"
+
+networks: 
+  traefik-public:
+    external: true
